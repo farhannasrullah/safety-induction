@@ -668,7 +668,7 @@ export default function App() {
                   )}
                 </h1>
                 <p className="text-xs text-slate-500 font-medium">
-                  {viewMode === 'admin' ? 'Database Kepatuhan K3' : 'Digital Verification System'}
+                  {viewMode === 'admin' ? 'Database Proyek Sekolah Rakyat Kab. Kediri' : 'Proyek Sekolah Rakyat Kab. Kediri'}
                 </p>
               </div>
             </div>
