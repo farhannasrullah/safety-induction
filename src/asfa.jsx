@@ -3,22 +3,15 @@ import {
   ShieldCheck, User, Building, Phone, PlayCircle, PenTool, 
   CheckCircle, ArrowRight, AlertTriangle, RefreshCcw, Lock, Unlock, Info, FileSignature, HardHat, Users,
   LayoutDashboard, Search, Calendar, ArrowUpDown, ArrowLeft, Image as ImageIcon, Key, LogOut, Briefcase, Hash, ClipboardList, ChevronDown, XCircle, FileImage,
-  Edit, Trash2, X, Award
+  Edit, Trash2, X
 } from 'lucide-react';
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 
 // --- FIREBASE INITIALIZATION ---
-const firebaseConfig = {
-    apiKey: "AIzaSyB1uQ54DGbQMiW-Ho8wPc1mNvld0cZUHyA",
-    authDomain: "safety-inductpwr.firebaseapp.com",
-    projectId: "safety-inductpwr",
-    storageBucket: "safety-inductpwr.firebasestorage.app",
-    messagingSenderId: "54533735940",
-    appId: "1:54533735940:web:98794aa5f3be22a1c6d751",
-    measurementId: "G-8FWZ263B1B"
-  };const app = initializeApp(firebaseConfig);
+const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const appId = typeof __app_id !== 'undefined' ? __app_id : 'safety-induction-app';
@@ -114,11 +107,6 @@ export default function App() {
     return saved ? JSON.parse(saved) : {};
   });
 
-  const [quizScore, setQuizScore] = useState(() => {
-    const saved = sessionStorage.getItem('si_quizScore');
-    return saved ? parseInt(saved) : 0;
-  });
-
   const [wrongAnswers, setWrongAnswers] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false); 
@@ -146,7 +134,6 @@ export default function App() {
   useEffect(() => { sessionStorage.setItem('si_step', step); }, [step]);
   useEffect(() => { sessionStorage.setItem('si_formData', JSON.stringify(formData)); }, [formData]);
   useEffect(() => { sessionStorage.setItem('si_quizAnswers', JSON.stringify(quizAnswers)); }, [quizAnswers]);
-  useEffect(() => { sessionStorage.setItem('si_quizScore', quizScore); }, [quizScore]);
   useEffect(() => { sessionStorage.setItem('si_viewMode', viewMode); }, [viewMode]);
 
   // ==========================================
@@ -282,7 +269,6 @@ export default function App() {
 
   const validateQuiz = () => {
     let allAnswered = true;
-    let correctCount = 0;
     let errors = [];
 
     QUIZ_DATA.forEach(q => {
@@ -290,8 +276,6 @@ export default function App() {
         allAnswered = false;
       } else if (quizAnswers[q.id] !== q.correctIndex) {
         errors.push(q.id);
-      } else {
-        correctCount++;
       }
     });
 
@@ -300,12 +284,14 @@ export default function App() {
       return;
     }
     
-    // Hitung skor akhir
-    const finalScore = Math.round((correctCount / QUIZ_DATA.length) * 100);
-    setQuizScore(finalScore);
-    setWrongAnswers(errors); // Tetap simpan mana yang salah untuk highlight jika user kembali ke step kuis
-    
-    setNotification({ msg: `Evaluasi selesai. Skor Anda: ${finalScore}%`, type: "success" });
+    if (errors.length > 0) {
+      setWrongAnswers(errors);
+      showNotification(`Terdapat ${errors.length} jawaban yang keliru. Silakan periksa kotak merah dan perbaiki jawaban Anda.`, "error");
+      return;
+    }
+
+    setWrongAnswers([]);
+    setNotification({ msg: "", type: "" });
     setStep(5);
   };
 
@@ -383,7 +369,6 @@ export default function App() {
       const docRef = await addDoc(inductionsRef, {
         userId: user?.uid || 'anonymous',
         ...formData,
-        score: `${quizScore}%`,
         signature: signatureDataUrl,
         timestamp: serverTimestamp(),
         status: 'Completed'
@@ -403,7 +388,6 @@ export default function App() {
           posisi: formData.posisi,
           kontakDarurat: "'" + formData.kontakDarurat, // Add quote for zero detection
           hubunganKontak: formData.hubunganKontak,
-          score: `${quizScore}%`,
           signature: signatureDataUrl
         }),
       });
@@ -760,7 +744,7 @@ export default function App() {
                         <tr className="bg-slate-50 border-b border-gray-100 text-xs uppercase tracking-wider text-slate-500">
                           <th className="p-4 font-bold">Pengunjung / Pekerja</th>
                           <th className="p-4 font-bold">Instansi & Posisi</th>
-                          <th className="p-4 font-bold">Skor Evaluasi</th>
+                          <th className="p-4 font-bold">Kontak Darurat</th>
                           <th className="p-4 font-bold">Waktu Induksi</th>
                           <th className="p-4 font-bold text-center">Tanda Tangan</th>
                           <th className="p-4 font-bold text-center">Aksi</th>
@@ -787,13 +771,8 @@ export default function App() {
                                 <div className="text-xs text-slate-500 mt-0.5 max-w-[200px] truncate" title={item.posisi}>Posisi: {item.posisi || '-'}</div>
                               </td>
                               <td className="p-4">
-                                <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-bold text-xs ${
-                                  parseInt(item.score) >= 80 ? 'bg-green-100 text-green-700' : 
-                                  parseInt(item.score) >= 60 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
-                                }`}>
-                                  <Award className="w-3.5 h-3.5" />
-                                  {item.score || '0%'}
-                                </div>
+                                <div className="font-medium text-slate-800">{item.kontakDarurat}</div>
+                                <div className="text-xs text-slate-500 mt-0.5">Hub: {item.hubunganKontak}</div>
                               </td>
                               <td className="p-4 text-slate-600 whitespace-nowrap">{formatDate(item.timestamp)}</td>
                               <td className="p-4 text-center">
@@ -975,7 +954,7 @@ export default function App() {
                     <div className="mb-8 flex flex-col items-center text-center">
                       <div className="bg-indigo-50 w-16 h-16 flex items-center justify-center rounded-2xl text-indigo-600 mb-4 border border-indigo-100"><ClipboardList className="w-8 h-8" /></div>
                       <h2 className="text-2xl font-extrabold text-slate-900">Kuis Evaluasi K3</h2>
-                      <p className="text-sm text-slate-500 mt-2 max-w-lg">Jawab seluruh pertanyaan berikut dengan benar untuk mengukur pemahaman Anda mengenai keselamatan kerja di area proyek.</p>
+                      <p className="text-sm text-slate-500 mt-2 max-w-lg">Jawab seluruh pertanyaan berikut dengan benar. Anda diwajibkan untuk mengulangi jika terdapat jawaban yang keliru.</p>
                     </div>
                     <div className="space-y-6 flex-grow overflow-y-auto pr-2 custom-scrollbar mb-8 rounded-2xl p-2 bg-white">
                       {QUIZ_DATA.map((item, qIndex) => {
@@ -986,6 +965,7 @@ export default function App() {
                               <span className={`flex-shrink-0 w-7 h-7 inline-flex items-center justify-center rounded-full text-xs font-black shadow-sm ${isWrong ? 'bg-red-500 text-white' : 'bg-yellow-400 text-slate-900'}`}>{qIndex + 1}</span>
                               <div className="pt-0.5">
                                 {item.question}
+                                {isWrong && <span className="block text-red-600 text-xs mt-1.5 font-bold"><XCircle className="w-3.5 h-3.5 inline mr-1 -mt-0.5" />Jawaban keliru, coba lagi.</span>}
                               </div>
                             </h3>
                             <div className="space-y-3 md:pl-10">
@@ -1005,7 +985,7 @@ export default function App() {
                     </div>
                     <div className="flex gap-4 border-t border-gray-100 pt-8 mt-auto">
                       <button onClick={() => setStep(3)} className="w-1/3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-4 rounded-2xl transition-colors">Kembali</button>
-                      <button onClick={validateQuiz} className="w-2/3 bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-slate-900/20 group">Selesaikan Kuis <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" /></button>
+                      <button onClick={validateQuiz} className="w-2/3 bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-slate-900/20 group">Cek & Pengesahan <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" /></button>
                     </div>
                   </div>
                 )}
@@ -1018,10 +998,7 @@ export default function App() {
                         <div className="bg-yellow-100 w-14 h-14 flex items-center justify-center rounded-2xl text-yellow-600 shrink-0"><PenTool className="w-7 h-7" /></div>
                         <div>
                           <h2 className="text-2xl font-extrabold text-slate-900">Pengesahan Akhir</h2>
-                          <div className="mt-1 flex items-center gap-2">
-                             <span className="text-xs text-slate-500 font-medium">Skor Evaluasi:</span>
-                             <span className={`text-xs font-bold px-2 py-0.5 rounded-md ${quizScore >= 80 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>{quizScore}%</span>
-                          </div>
+                          <p className="text-sm text-slate-500 mt-1">Konfirmasi komitmen K3 Anda.</p>
                         </div>
                       </div>
                       <div className="bg-white border border-slate-200 p-6 rounded-2xl text-sm text-slate-600 shadow-sm flex-grow flex flex-col justify-center">
@@ -1074,7 +1051,7 @@ export default function App() {
                         <CheckCircle className="w-12 h-12 text-white animate-[scaleIn_0.5s_ease-out]" />
                       </div>
                       <h2 className="text-3xl font-extrabold mb-2 text-slate-900 tracking-tight">Akses Diberikan!</h2>
-                      <p className="text-slate-500 mb-8 leading-relaxed">Terima kasih, <strong className="text-slate-800">{formData.nama}</strong>.<br/>Data keselamatan Anda dengan skor <span className="font-bold text-slate-900">{quizScore}%</span> telah terekam.</p>
+                      <p className="text-slate-500 mb-8 leading-relaxed">Terima kasih, <strong className="text-slate-800">{formData.nama}</strong>.<br/>Data keselamatan Anda telah terekam.</p>
                       <div className="bg-gray-50 border border-gray-200 rounded-2xl p-5 mb-8 text-left flex items-center gap-4 shadow-inner">
                         <div className="bg-white p-3 rounded-xl shadow-sm border border-gray-100"><ShieldCheck className="w-8 h-8 text-green-500" /></div>
                         <div>
@@ -1196,7 +1173,7 @@ export default function App() {
         {viewMode === 'admin' && deleteData && (
           <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4 sm:p-6" style={{ backgroundColor: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(8px)' }}>
             <div className="absolute inset-0 cursor-pointer" onClick={() => !isCRUDLoading && setDeleteData(null)}></div>
-            <div className="relative bg-white rounded-3xl shadow-2xl w-full max-sm animate-fade-in-up overflow-hidden flex flex-col border border-slate-200 text-center p-8">
+            <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm animate-fade-in-up overflow-hidden flex flex-col border border-slate-200 text-center p-8">
               <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-5">
                 <AlertTriangle className="w-8 h-8" />
               </div>
