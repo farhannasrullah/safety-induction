@@ -131,6 +131,8 @@ export default function App() {
   const [isVideoFinished, setIsVideoFinished] = useState(false);
   const videoRef = useRef(null);
   const maxTimeWatched = useRef(0);
+  const [watchTime, setWatchTime] = useState(0);
+  const MIN_WATCH_TIME = 10; // detik
 // Poster Slider States (TAMBAHKAN DI SINI)
 const posters = [
   "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776177619/PENGECORAN_uyvrcv.png",
@@ -297,13 +299,20 @@ useEffect(() => {
   };
 
   // --- VIDEO LOGIC ---
-  const handleVideoEnded = () => setIsVideoFinished(true);
+  const handleVideoEnded = () => {
+    setIsVideoFinished(true);
+    setWatchTime(MIN_WATCH_TIME);
+  };
 
   const handleVideoTimeUpdate = (e) => {
     const video = e.target;
+  
     if (!video.seeking) {
       maxTimeWatched.current = Math.max(maxTimeWatched.current, video.currentTime);
     }
+  
+    // update waktu nonton (dibatasi max 10 detik)
+    setWatchTime(Math.min(video.currentTime, MIN_WATCH_TIME));
   };
 
   const handleVideoSeeking = (e) => {
@@ -989,12 +998,38 @@ useEffect(() => {
                       )}
                     </div>
                     <div className="flex gap-4 flex-col sm:flex-row">
-                      <button onClick={() => setStep(1)} className="sm:w-1/3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-4 rounded-2xl transition-colors">Kembali</button>
-                      <button onClick={() => { if (isVideoFinished) setStep(3); else showNotification("Anda harus menonton video sampai durasi selesai.", "error"); }} disabled={!isVideoFinished} className={`flex-1 font-bold py-4 rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 ${isVideoFinished ? 'bg-yellow-400 hover:bg-yellow-500 text-slate-900 shadow-lg shadow-yellow-400/30 btn-pulse-glow transform hover:-translate-y-1' : 'bg-gray-100 text-gray-400 cursor-not-allowed border-2 border-dashed border-gray-200'}`}>
-                        {isVideoFinished ? <Unlock className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
-                        {isVideoFinished ? 'Lanjut ke Poster' : 'Lanjutkan Terkunci'}
-                      </button>
-                    </div>
+  <button
+    onClick={() => setStep(1)}
+    className="sm:w-1/3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-4 rounded-2xl transition-colors"
+  >
+    Kembali
+  </button>
+
+  <button
+    onClick={() => {
+      if (watchTime >= MIN_WATCH_TIME) setStep(3);
+      else showNotification("Tonton minimal 10 detik dulu!", "error");
+    }}
+    disabled={watchTime < MIN_WATCH_TIME}
+    className={`flex-1 font-bold py-4 rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 ${
+      watchTime >= MIN_WATCH_TIME
+        ? "bg-yellow-400 hover:bg-yellow-500 text-slate-900 shadow-lg hover:-translate-y-1"
+        : "bg-gray-100 text-gray-400 cursor-not-allowed border-2 border-dashed border-gray-200"
+    }`}
+  >
+    {watchTime >= MIN_WATCH_TIME ? (
+      <>
+        <Unlock className="w-5 h-5" />
+        Lanjut ke Poster
+      </>
+    ) : (
+      <>
+        <Lock className="w-5 h-5" />
+        Tunggu {Math.ceil(MIN_WATCH_TIME - watchTime)} detik
+      </>
+    )}
+  </button>
+</div>
                   </div>
                 )}
 
