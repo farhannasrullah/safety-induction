@@ -129,10 +129,12 @@ export default function App() {
   
   // Video States
   const [isVideoFinished, setIsVideoFinished] = useState(false);
+  
   const videoRef = useRef(null);
   const maxTimeWatched = useRef(0);
   const [watchTime, setWatchTime] = useState(0);
   const MIN_WATCH_TIME = 10; // detik
+  const lastTime = useRef(0);
 // Poster Slider States (TAMBAHKAN DI SINI)
 const posters = [
   "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776177619/PENGECORAN_uyvrcv.png",
@@ -170,7 +172,13 @@ const prevPoster = () => {
     return next;
   });
 };
-
+useEffect(() => {
+  if (videoRef.current) {
+    videoRef.current.currentTime = 0;
+    lastTime.current = 0;
+    setWatchTime(0);
+  }
+}, []);
 useEffect(() => {
   markPosterViewed(currentPoster);
 }, [currentPoster]);
@@ -307,19 +315,30 @@ useEffect(() => {
   const handleVideoTimeUpdate = (e) => {
     const video = e.target;
   
-    if (!video.seeking) {
-      maxTimeWatched.current = Math.max(maxTimeWatched.current, video.currentTime);
+    // 🚫 DETEKSI SKIP
+    if (video.currentTime > lastTime.current + 1) {
+      video.currentTime = lastTime.current; // balik ke posisi aman
+      showNotification("Tidak boleh skip video!", "error");
+      return;
     }
   
-    // update waktu nonton (dibatasi max 10 detik)
-    setWatchTime(Math.min(video.currentTime, MIN_WATCH_TIME));
+    // ✅ update waktu normal
+    const delta = video.currentTime - lastTime.current;
+  
+    if (delta > 0 && delta < 1) {
+      setWatchTime((prev) =>
+        Math.min(prev + delta, MIN_WATCH_TIME)
+      );
+    }
+  
+    lastTime.current = video.currentTime;
   };
-
   const handleVideoSeeking = (e) => {
     const video = e.target;
-    if (video.currentTime > maxTimeWatched.current + 1) {
-      video.currentTime = maxTimeWatched.current;
-      showNotification("Peringatan: Anda tidak dapat mempercepat/melewati video materi induksi.", "error");
+  
+    if (video.currentTime > lastTime.current + 0.5) {
+      video.currentTime = lastTime.current;
+      showNotification("Tidak bisa mempercepat video!", "error");
     }
   };
 
