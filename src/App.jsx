@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  ShieldCheck, User, Building, Phone, PlayCircle, PenTool, 
+import {
+  ShieldCheck, User, Building, Phone, PlayCircle, PenTool,
   CheckCircle, ArrowRight, AlertTriangle, RefreshCcw, Lock, Unlock, Info, FileSignature, HardHat, Users,
   LayoutDashboard, Search, Calendar, ArrowUpDown, ArrowLeft, Image as ImageIcon, Key, LogOut, Briefcase, Hash, ClipboardList, ChevronDown, XCircle, FileImage,
-  Edit, Trash2, X, Award
+  Edit, Trash2, X, Award, ChevronLeft, ChevronRight, Maximize2, Minimize2
 } from 'lucide-react';
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'firebase/auth';
@@ -87,6 +87,7 @@ const QUIZ_DATA = [
   }
 ];
 
+
 export default function App() {
   const [isAppLoading, setIsAppLoading] = useState(true);
   const [user, setUser] = useState(null);
@@ -130,6 +131,43 @@ export default function App() {
   const [isVideoFinished, setIsVideoFinished] = useState(false);
   const videoRef = useRef(null);
   const maxTimeWatched = useRef(0);
+// Poster Slider States (TAMBAHKAN DI SINI)
+const posters = [
+  "https://res.cloudinary.com/dqsz8sfrw/image/upload/f_auto,q_auto/F1_2022_Screenshot_2026.04.12_-_20.20.54.23_w898mz",
+  "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776148094/F1_2022_Screenshot_2026.04.02_-_08.50.46.95_jqa5jj.png",
+  "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776145312/main-sample.png",
+];
+
+const [currentPoster, setCurrentPoster] = useState(0);
+const [isPosterMaximized, setIsPosterMaximized] = useState(false);
+const [viewedPosters, setViewedPosters] = useState(() => [0]);
+
+const allPostersViewed = viewedPosters.length === posters.length;
+
+const markPosterViewed = (index) => {
+  setViewedPosters((prev) => (prev.includes(index) ? prev : [...prev, index]));
+};
+
+const goToPoster = (index) => {
+  setCurrentPoster(index);
+  markPosterViewed(index);
+};
+
+const nextPoster = () => {
+  if (currentPoster < posters.length - 1) {
+    goToPoster(currentPoster + 1);
+  }
+};
+
+const prevPoster = () => {
+  if (currentPoster > 0) {
+    goToPoster(currentPoster - 1);
+  }
+};
+
+useEffect(() => {
+  markPosterViewed(currentPoster);
+}, [currentPoster]);
 
   // Signature State
   const [agreedToTerms, setAgreedToTerms] = useState(false);
@@ -926,7 +964,7 @@ export default function App() {
                     </div>
                     <div className="relative rounded-2xl overflow-hidden bg-slate-900 shadow-inner ring-4 ring-slate-50 mb-8 group w-full aspect-video">
                       <video ref={videoRef} controls onEnded={handleVideoEnded} onTimeUpdate={handleVideoTimeUpdate} onSeeking={handleVideoSeeking} className="w-full h-full object-contain opacity-95 group-hover:opacity-100 transition-opacity" poster="https://images.unsplash.com/photo-1541888086425-d81bb19240f5?q=80&w=800&auto=format&fit=crop">
-                        <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4" />
+                        <source src="https://res.cloudinary.com/dqsz8sfrw/video/upload/v1776147611/SAFETY_INDUCTION_5_2_rgocpr.mp4" type="video/mp4" />
                         Browser tidak mendukung pemutar video.
                       </video>
                       {!isVideoFinished && (
@@ -951,23 +989,210 @@ export default function App() {
 
                 {/* STEP 3: Poster */}
                 {step === 3 && (
-                  <div className="bg-white rounded-3xl shadow-xl animate-fade-in-up border border-gray-100 overflow-hidden flex flex-col md:flex-row max-w-6xl mx-auto min-h-[600px]">
-                    <div className="md:w-5/12 bg-slate-900 border-r border-gray-100 relative overflow-hidden flex flex-col justify-center p-8 md:p-12">
-                      <div className="absolute top-0 left-0 w-64 h-64 bg-blue-500 rounded-full blur-[80px] opacity-20 -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
-                      <h3 className="text-white font-extrabold text-3xl flex items-center gap-3 mb-4"><Info className="w-8 h-8 text-yellow-400"/> Poster<br/>Keselamatan</h3>
-                      <p className="text-slate-400 text-base leading-relaxed">Perhatikan petunjuk visual K3 ini dengan saksama. Informasi pada poster ini akan menjadi referensi penting Anda dalam menjawab evaluasi di tahap selanjutnya.</p>
-                    </div>
-                    <div className="md:w-7/12 p-8 flex flex-col bg-slate-50 relative">
-                      <div className="flex-grow w-full flex items-center justify-center mb-8 relative rounded-2xl bg-white border border-gray-200 shadow-inner p-2 md:p-4">
-                        <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1200&auto=format&fit=crop" alt="Poster K3" className="w-full h-full max-h-[60vh] object-contain rounded-xl drop-shadow-sm" />
-                      </div>
-                      <div className="flex gap-4 w-full mt-auto">
-                        <button onClick={() => setStep(2)} className="w-1/3 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-bold py-4 rounded-2xl transition-colors shadow-sm">Kembali</button>
-                        <button onClick={() => setStep(4)} className="w-2/3 bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg transition-all transform hover:-translate-y-1 hover:shadow-slate-900/20 group">Paham & Lanjut Kuis <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform"/></button>
-                      </div>
-                    </div>
-                  </div>
-                )}
+  <>
+    <div className="bg-white rounded-3xl shadow-xl animate-fade-in-up border border-gray-100 overflow-hidden flex flex-col md:flex-row max-w-6xl mx-auto min-h-[600px]">
+      <div className="md:w-5/12 bg-slate-900 border-r border-gray-100 relative overflow-hidden flex flex-col justify-center p-8 md:p-12">
+        <div className="absolute top-0 left-0 w-64 h-64 bg-blue-500 rounded-full blur-[80px] opacity-20 -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+        <h3 className="text-white font-extrabold text-3xl flex items-center gap-3 mb-4">
+          <Info className="w-8 h-8 text-yellow-400" />
+          Poster
+          <br />
+          Keselamatan
+        </h3>
+        <p className="text-slate-400 text-base leading-relaxed">
+          Perhatikan petunjuk visual K3 ini dengan saksama. Informasi pada poster ini akan menjadi referensi penting Anda dalam menjawab evaluasi di tahap selanjutnya.
+        </p>
+      </div>
+
+      <div className="md:w-7/12 p-6 md:p-8 pb-24 md:pb-8 flex flex-col bg-slate-50 relative">
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <div className="text-sm font-bold text-slate-700">
+            Poster {currentPoster + 1} dari {posters.length}
+          </div>
+
+          <button
+            onClick={() => setIsPosterMaximized(true)}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-gray-200 hover:bg-gray-50 text-slate-700 font-bold shadow-sm transition-colors"
+          >
+            <Maximize2 className="w-4 h-4" />
+            Maksimalkan
+          </button>
+        </div>
+
+        <div className="flex-grow w-full flex items-center justify-center mb-5 relative rounded-2xl bg-white border border-gray-200 shadow-inner p-2 md:p-4 overflow-hidden">
+          <img
+            src={posters[currentPoster]}
+            alt={`Poster ${currentPoster + 1}`}
+            className="w-full h-auto max-h-[60vh] md:max-h-[70vh] object-contain rounded-xl drop-shadow-sm select-none"
+            onLoad={() => markPosterViewed(currentPoster)}
+            draggable="false"
+          />
+
+          <button
+            onClick={prevPoster}
+            disabled={currentPoster === 0}
+            className={`absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-lg transition-all border ${
+              currentPoster === 0
+                ? "bg-white/70 text-gray-300 border-gray-200 cursor-not-allowed"
+                : "bg-slate-900/90 text-white border-white/10 hover:bg-slate-800 hover:scale-105"
+            }`}
+            aria-label="Poster sebelumnya"
+          >
+            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+          </button>
+
+          <button
+            onClick={nextPoster}
+            disabled={currentPoster === posters.length - 1}
+            className={`absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-lg transition-all border ${
+              currentPoster === posters.length - 1
+                ? "bg-white/70 text-gray-300 border-gray-200 cursor-not-allowed"
+                : "bg-slate-900/90 text-white border-white/10 hover:bg-slate-800 hover:scale-105"
+            }`}
+            aria-label="Poster berikutnya"
+          >
+            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+          </button>
+        </div>
+
+        <div className="flex justify-center gap-2 mb-4 flex-wrap">
+          {posters.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goToPoster(index)}
+              className={`h-2.5 rounded-full transition-all duration-300 ${
+                index === currentPoster
+                  ? "w-8 bg-blue-500"
+                  : viewedPosters.includes(index)
+                  ? "w-2.5 bg-emerald-400"
+                  : "w-2.5 bg-gray-300"
+              }`}
+              aria-label={`Buka poster ${index + 1}`}
+            />
+          ))}
+        </div>
+
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <span className="text-xs font-medium text-slate-500">
+            {allPostersViewed
+              ? "Semua poster sudah dilihat. Tombol lanjut sudah aktif."
+              : "Harus melihat semua poster dulu sebelum lanjut."}
+          </span>
+          <span className="text-xs font-bold text-slate-700">
+            {viewedPosters.length}/{posters.length}
+          </span>
+        </div>
+
+        <div className="flex gap-4 w-full mt-auto">
+          <button
+            onClick={() => setStep(2)}
+            className="w-1/3 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-bold py-4 rounded-2xl transition-colors shadow-sm"
+          >
+            Kembali
+          </button>
+
+          <button
+            onClick={() => {
+              if (allPostersViewed) setStep(4);
+              else showNotification("Harus melihat semua poster dulu sebelum lanjut.", "error");
+            }}
+            disabled={!allPostersViewed}
+            className={`w-2/3 font-bold py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg transition-all transform ${
+              allPostersViewed
+                ? "bg-slate-900 hover:bg-slate-800 text-white hover:-translate-y-1 hover:shadow-slate-900/20"
+                : "bg-gray-100 text-gray-400 cursor-not-allowed border-2 border-dashed border-gray-200"
+            }`}
+          >
+            {allPostersViewed ? <CheckCircle className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
+            {allPostersViewed ? "Paham & Lanjut Kuis" : "Lihat Semua Poster"}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    {isPosterMaximized && (
+      <div className="fixed top-20 md:top-24 left-0 right-0 bottom-0 z-40 bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-4">
+        <div className="w-full max-w-7xl h-[calc(100vh-5rem)] md:h-[calc(100vh-6rem)] bg-slate-950 rounded-3xl border border-white/10 shadow-2xl overflow-hidden flex flex-col">
+          <div className="flex items-center justify-between p-4 md:p-6 border-b border-white/10">
+            <div className="text-white font-bold">
+              Poster {currentPoster + 1} / {posters.length}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsPosterMaximized(false)}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold transition-colors"
+              >
+                <Minimize2 className="w-4 h-4" />
+                Kecilkan
+              </button>
+              <button
+                onClick={() => setIsPosterMaximized(false)}
+                className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/15 text-white flex items-center justify-center transition-colors"
+                aria-label="Tutup"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          <div className="flex-1 relative flex items-center justify-center bg-black overflow-hidden">
+            <img
+              src={posters[currentPoster]}
+              alt={`Poster ${currentPoster + 1}`}
+              className="max-w-full max-h-full object-contain select-none"
+              onLoad={() => markPosterViewed(currentPoster)}
+              draggable="false"
+            />
+
+            <button
+              onClick={prevPoster}
+              disabled={currentPoster === 0}
+              className={`absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-11 h-11 sm:w-14 sm:h-14 rounded-full flex items-center justify-center shadow-lg transition-all border ${
+                currentPoster === 0
+                  ? "bg-white/10 text-white/30 border-white/10 cursor-not-allowed"
+                  : "bg-white/10 text-white border-white/15 hover:bg-white/20"
+              }`}
+              aria-label="Poster sebelumnya"
+            >
+              <ChevronLeft className="w-6 h-6 sm:w-7 sm:h-7" />
+            </button>
+
+            <button
+              onClick={nextPoster}
+              disabled={currentPoster === posters.length - 1}
+              className={`absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 w-11 h-11 sm:w-14 sm:h-14 rounded-full flex items-center justify-center shadow-lg transition-all border ${
+                currentPoster === posters.length - 1
+                  ? "bg-white/10 text-white/30 border-white/10 cursor-not-allowed"
+                  : "bg-white/10 text-white border-white/15 hover:bg-white/20"
+              }`}
+              aria-label="Poster berikutnya"
+            >
+              <ChevronRight className="w-6 h-6 sm:w-7 sm:h-7" />
+            </button>
+          </div>
+
+          <div className="p-4 border-t border-white/10 flex items-center justify-center gap-2 bg-slate-950 flex-wrap">
+            {posters.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => goToPoster(index)}
+                className={`h-2.5 rounded-full transition-all duration-300 ${
+                  index === currentPoster
+                    ? "w-8 bg-blue-500"
+                    : viewedPosters.includes(index)
+                    ? "w-2.5 bg-emerald-400"
+                    : "w-2.5 bg-white/30"
+                }`}
+                aria-label={`Buka poster ${index + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    )}
+  </>
+)}
 
                 {/* STEP 4: Kuis */}
                 {step === 4 && (
