@@ -133,9 +133,11 @@ export default function App() {
   const maxTimeWatched = useRef(0);
 // Poster Slider States (TAMBAHKAN DI SINI)
 const posters = [
-  "https://res.cloudinary.com/dqsz8sfrw/image/upload/f_auto,q_auto/F1_2022_Screenshot_2026.04.12_-_20.20.54.23_w898mz",
-  "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776148094/F1_2022_Screenshot_2026.04.02_-_08.50.46.95_jqa5jj.png",
-  "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776145312/main-sample.png",
+  "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776177619/PENGECORAN_uyvrcv.png",
+  "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776177626/LIFTING_jxltmx.png",
+  "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776177634/SAFETY_INDUCTION_A3_gybxfc.png",
+  "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776177642/PLASTER_DINDING_tt3tao.png",
+  "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776177650/SAFETY_ZONE_auanso.png",
 ];
 
 const [currentPoster, setCurrentPoster] = useState(0);
@@ -150,19 +152,21 @@ const markPosterViewed = (index) => {
 
 const goToPoster = (index) => {
   setCurrentPoster(index);
-  markPosterViewed(index);
 };
-
 const nextPoster = () => {
-  if (currentPoster < posters.length - 1) {
-    goToPoster(currentPoster + 1);
-  }
+  setCurrentPoster((prev) => {
+    const next = Math.min(prev + 1, posters.length - 1);
+    markPosterViewed(next);
+    return next;
+  });
 };
 
 const prevPoster = () => {
-  if (currentPoster > 0) {
-    goToPoster(currentPoster - 1);
-  }
+  setCurrentPoster((prev) => {
+    const next = Math.max(prev - 1, 0);
+    markPosterViewed(next);
+    return next;
+  });
 };
 
 useEffect(() => {
@@ -706,7 +710,7 @@ useEffect(() => {
                   )}
                 </h1>
                 <p className="text-xs text-slate-500 font-medium">
-                  {viewMode === 'admin' ? 'Database Proyek Sekolah Rakyat Kab. Kediri' : 'Proyek Sekolah Rakyat Kab. Kediri'}
+                  {viewMode === 'admin' ? 'Database Administrator' : 'Proyek Sekolah Rakyat Kab. Kediri'}
                 </p>
               </div>
             </div>
@@ -877,12 +881,19 @@ useEffect(() => {
                 {/* STEP 1: Form Pendaftaran */}
                 {step === 1 && (
                   <div className="bg-white rounded-3xl shadow-xl animate-fade-in-up border border-gray-100 overflow-hidden flex flex-col md:flex-row max-w-5xl mx-auto">
-                    <div className="md:w-5/12 bg-slate-900 text-white p-8 md:p-12 flex flex-col justify-center relative overflow-hidden">
+                    {/* <div className="md:w-5/12 bg-slate-900 text-white p-8 md:p-12 flex flex-col justify-center relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-72 h-72 bg-yellow-400 rounded-full blur-[80px] opacity-20 translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
                       <ShieldCheck className="w-20 h-20 text-yellow-400 mb-6" />
                       <h2 className="text-3xl md:text-4xl font-extrabold mb-4 leading-tight">Registrasi<br/>Induksi K3</h2>
                       <p className="text-slate-400 text-sm md:text-base leading-relaxed">Lengkapi profil identitas dan pekerjaan Anda untuk memulai proses edukasi dan sertifikasi keselamatan digital.</p>
+                    </div> */}
+                    <div className="w-fit md:w-5/12 bg-slate-900 text-white p-6 md:p-12 flex flex-col justify-center relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-72 h-72 bg-yellow-400 rounded-full blur-[80px] opacity-20 translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+                      <ShieldCheck className="w-15 h-15 text-yellow-400 mb-6" />
+                      <h2 className="text-3xl md:text-4xl font-extrabold mb-4 leading-tight">Registrasi<br/>Induksi K3</h2>
+                      <p className="text-slate-400 text-sm md:text-base leading-relaxed">Lengkapi profil identitas dan pekerjaan Anda untuk memulai proses edukasi dan sertifikasi keselamatan digital.</p>
                     </div>
+                    
 
                     <div className="md:w-7/12 p-8 md:p-12">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
@@ -890,14 +901,14 @@ useEffect(() => {
                           <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nama Lengkap</label>
                           <div className="relative">
                             <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 group-focus-within:text-yellow-500 transition-colors" />
-                            <input type="text" name="nama" value={formData.nama} onChange={handleInputChange} className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-yellow-400 focus:bg-white transition-all text-slate-800 font-medium" placeholder="Sesuai KTP" />
+                            <input type="text" name="nama" value={formData.nama} onChange={handleInputChange} className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-yellow-400 focus:bg-white transition-all text-slate-800 font-medium" placeholder="Nama Lengkap Sesuai KTP" />
                           </div>
                         </div>
                         <div className="group">
                           <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">No Pribadi (WA)</label>
                           <div className="relative">
                             <Hash className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 group-focus-within:text-yellow-500 transition-colors" />
-                            <input type="tel" name="noPribadi" value={formData.noPribadi} onChange={handleInputChange} className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-yellow-400 focus:bg-white transition-all text-slate-800 font-medium" placeholder="0812-xxxx" />
+                            <input type="tel" name="noPribadi" value={formData.noPribadi} onChange={handleInputChange} className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-yellow-400 focus:bg-white transition-all text-slate-800 font-medium" placeholder="08xxxx" />
                           </div>
                         </div>
                         <div className="group">
@@ -981,7 +992,7 @@ useEffect(() => {
                       <button onClick={() => setStep(1)} className="sm:w-1/3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-4 rounded-2xl transition-colors">Kembali</button>
                       <button onClick={() => { if (isVideoFinished) setStep(3); else showNotification("Anda harus menonton video sampai durasi selesai.", "error"); }} disabled={!isVideoFinished} className={`flex-1 font-bold py-4 rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 ${isVideoFinished ? 'bg-yellow-400 hover:bg-yellow-500 text-slate-900 shadow-lg shadow-yellow-400/30 btn-pulse-glow transform hover:-translate-y-1' : 'bg-gray-100 text-gray-400 cursor-not-allowed border-2 border-dashed border-gray-200'}`}>
                         {isVideoFinished ? <Unlock className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
-                        {isVideoFinished ? 'Lanjut ke Poster' : 'Video Terkunci'}
+                        {isVideoFinished ? 'Lanjut ke Poster' : 'Lanjutkan Terkunci'}
                       </button>
                     </div>
                   </div>
@@ -1021,6 +1032,7 @@ useEffect(() => {
 
         <div className="flex-grow w-full flex items-center justify-center mb-5 relative rounded-2xl bg-white border border-gray-200 shadow-inner p-2 md:p-4 overflow-hidden">
           <img
+            key={currentPoster}
             src={posters[currentPoster]}
             alt={`Poster ${currentPoster + 1}`}
             className="w-full h-auto max-h-[60vh] md:max-h-[70vh] object-contain rounded-xl drop-shadow-sm select-none"
@@ -1138,6 +1150,7 @@ useEffect(() => {
 
           <div className="flex-1 relative flex items-center justify-center bg-black overflow-hidden">
             <img
+              key={currentPoster}
               src={posters[currentPoster]}
               alt={`Poster ${currentPoster + 1}`}
               className="max-w-full max-h-full object-contain select-none"
