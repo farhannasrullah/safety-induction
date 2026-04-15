@@ -35,6 +35,7 @@ const getTodayDate = () => {
 
 // --- DATA KUIS ---
 const QUIZ_DATA = [
+  // --- SOAL PENILAIAN (masuk skor) ---
   {
     id: 1,
     question: "Apa nama proyek tempat Anda bekerja saat ini?",
@@ -84,6 +85,28 @@ const QUIZ_DATA = [
       "Mengukur suhu"
     ],
     correctIndex: 0
+  },
+
+  // --- SOAL ANALISIS (tidak masuk skor) ---
+  {
+    id: 6,
+    isAnalysis: true,
+    question: "Apakah video induction dan poster keselamatan membantu Anda memahami informasi dan potensi bahaya di area proyek?",
+    options: [
+      "Tidak membantu",
+      "Cukup membantu",
+      "Sangat membantu"
+    ]
+  },
+  {
+    id: 7,
+    isAnalysis: true,
+    question: "Apakah penggunaan web aplikasi ini mempermudah proses safety induction?",
+    options: [
+      "Tidak efektif",
+      "Cukup efektif",
+      "Sangat efektif"
+    ]
   }
 ];
 
@@ -351,30 +374,31 @@ useEffect(() => {
   };
 
   const validateQuiz = () => {
-    let allAnswered = true;
-    let correctCount = 0;
-    let errors = [];
-
-    QUIZ_DATA.forEach(q => {
-      if (quizAnswers[q.id] === undefined) {
-        allAnswered = false;
-      } else if (quizAnswers[q.id] !== q.correctIndex) {
-        errors.push(q.id);
-      } else {
-        correctCount++;
-      }
-    });
-
+    const scoredQuestions = QUIZ_DATA.filter(q => !q.isAnalysis);
+    const analysisQuestions = QUIZ_DATA.filter(q => q.isAnalysis);
+  
+    // Cek semua soal wajib dijawab (baik penilaian maupun analisis)
+    const allAnswered = QUIZ_DATA.every(q => quizAnswers[q.id] !== undefined);
     if (!allAnswered) {
-      showNotification("Harap jawab semua pertanyaan evaluasi (5 soal) terlebih dahulu.", "error");
+      showNotification("Harap jawab semua pertanyaan (termasuk pertanyaan umpan balik).", "error");
       return;
     }
-    
-    // Hitung skor akhir
-    const finalScore = Math.round((correctCount / QUIZ_DATA.length) * 100);
+  
+    // Hitung skor hanya dari soal penilaian
+    let correctCount = 0;
+    let errors = [];
+    scoredQuestions.forEach(q => {
+      if (quizAnswers[q.id] === q.correctIndex) {
+        correctCount++;
+      } else {
+        errors.push(q.id);
+      }
+    });
+  
+    const finalScore = Math.round((correctCount / scoredQuestions.length) * 100);
     setQuizScore(finalScore);
-    setWrongAnswers(errors); // Tetap simpan mana yang salah untuk highlight jika user kembali ke step kuis
-    
+    setWrongAnswers(errors);
+  
     setNotification({ msg: `Evaluasi selesai. Skor Anda: ${finalScore}%`, type: "success" });
     setStep(5);
   };
@@ -448,7 +472,21 @@ useEffect(() => {
     try {
       const canvas = canvasRef.current;
       const signatureDataUrl = canvas.toDataURL("image/png");
-      
+  
+      // Ambil jawaban soal analisis berdasarkan teks opsi
+      const getAnalysisAnswer = (questionId) => {
+        const question = QUIZ_DATA.find(q => q.id === questionId);
+        const answerIndex = quizAnswers[questionId];
+        if (question && answerIndex !== undefined) {
+          return question.options[answerIndex];
+        }
+        return "";
+      };
+  
+      const analisisVideo = getAnalysisAnswer(6);   // Soal id 6
+      const analisisWeb = getAnalysisAnswer(7);     // Soal id 7
+  
+      // Simpan ke Firestore (tambah field analisis)
       const inductionsRef = collection(db, 'artifacts', appId, 'public', 'data', 'inductions');
       const docRef = await addDoc(inductionsRef, {
         userId: user?.uid || 'anonymous',
@@ -456,28 +494,32 @@ useEffect(() => {
         score: `${quizScore}%`,
         signature: signatureDataUrl,
         timestamp: serverTimestamp(),
-        status: 'Completed'
+        status: 'Completed',
+        analisisVideo,   // Field baru
+        analisisWeb      // Field baru
       });
-      
-      // Fix: Add single quote to phone numbers for Spreadsheet detection
+  
+      // Kirim ke Apps Script (tambah field analisis di kolom K & L)
       await fetch(GAS_URL, {
         method: "POST",
-        mode: "no-cors", 
+        mode: "no-cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: 'create',
           id: docRef.id,
           nama: formData.nama,
-          noPribadi: "'" + formData.noPribadi, // Add quote for zero detection
+          noPribadi: "'" + formData.noPribadi,
           instansi: formData.instansi,
           posisi: formData.posisi,
-          kontakDarurat: "'" + formData.kontakDarurat, // Add quote for zero detection
+          kontakDarurat: "'" + formData.kontakDarurat,
           hubunganKontak: formData.hubunganKontak,
           score: `${quizScore}%`,
-          signature: signatureDataUrl
+          signature: signatureDataUrl,
+          analisisVideo,   // Kolom K
+          analisisWeb      // Kolom L
         }),
       });
-      
+  
       setStep(6);
     } catch (err) {
       console.error(err);
@@ -849,12 +891,12 @@ useEffect(() => {
                             <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group/row">
                               <td className="p-4">
                                 <div className="font-bold text-slate-900">{item.nama}</div>
-                                <div className="text-xs text-slate-500 mt-0.5">No: {item.noPribadi || '-'}</div>
+                                <div className="text-xs text-slate-500 mt-0.5">No WA : {item.noPribadi || '-'}</div>
                                 <div className="text-xs text-green-600 font-medium flex items-center gap-1 mt-1"><CheckCircle className="w-3 h-3" /> {item.status}</div>
                               </td>
                               <td className="p-4">
                                 <div className="font-bold text-slate-700">{item.instansi}</div>
-                                <div className="text-xs text-slate-500 mt-0.5 max-w-[200px] truncate" title={item.posisi}>Posisi: {item.posisi || '-'}</div>
+                                <div className="text-xs text-slate-500 mt-0.5 max-w-[200px] truncate" title={item.posisi}>Posisi : {item.posisi || '-'}</div>
                               </td>
                               <td className="p-4">
                                 <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-bold text-xs ${
