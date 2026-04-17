@@ -77,10 +77,8 @@ export default function Step2Video({ setStep, showNotification }) {
         {!isVideoFinished && (
           <div className="absolute top-4 right-4 bg-slate-900/80 backdrop-blur-sm px-4 py-2 rounded-full flex items-center gap-2 pointer-events-none border border-white/20">
             <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500" />
+
             </span>
-            <span className="text-[10px] font-bold text-white tracking-widest uppercase">Wajib Tonton</span>
           </div>
         )}
       </div>
@@ -107,7 +105,7 @@ export default function Step2Video({ setStep, showNotification }) {
         >
           {watchTime >= MIN_WATCH_SECONDS
             ? <><Unlock className="w-5 h-5" /> Lanjut ke Poster</>
-            : <><Lock className="w-5 h-5" /> Lihat Video Sampai Selesai {Math.ceil(MIN_WATCH_SECONDS - watchTime)} detik</>}
+            : <><Lock className="w-5 h-5" /> Lihat Video {Math.ceil(MIN_WATCH_SECONDS - watchTime)} detik</>}
         </button>
       </div>
     </div>
