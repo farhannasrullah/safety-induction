@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import {
   ShieldCheck, User, Building, Phone, PlayCircle, PenTool,
@@ -158,58 +159,59 @@ export default function App() {
   const [watchTime, setWatchTime] = useState(0);
   const MIN_WATCH_TIME = 10; // detik
   const lastTime = useRef(0);
-// Poster Slider States (TAMBAHKAN DI SINI)
-const posters = [
-  "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776428418/INFO_KESELAMATAN_PROYEK_mohlt2.png",
-  "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776428417/KETINGGIAN_xgcnzm.png",
-  "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776428415/KELISTRIKAN_fajkil.png",
-  "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776428414/PLASTER_DINDING_h19heu.png",
-  "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776428412/PENGECORAN_yzyadu.png",
-  "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776428411/LIFTING_czzpvr.png",
-  "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776428410/SAFETY_ZONE_znk8vv.png",
-  "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776428408/PENGELASAN_cfbtjs.png",
-  "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776428404/SCAFHOLDING_s6d03s.png",
-  "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776428405/SAFETY_INDUCTION_A3_yfgikq.png",
-];
 
-const [currentPoster, setCurrentPoster] = useState(0);
-const [isPosterMaximized, setIsPosterMaximized] = useState(false);
-const [viewedPosters, setViewedPosters] = useState(() => [0]);
+  // Poster Slider States
+  const posters = [
+    "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776428418/INFO_KESELAMATAN_PROYEK_mohlt2.png",
+    "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776428417/KETINGGIAN_xgcnzm.png",
+    "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776428415/KELISTRIKAN_fajkil.png",
+    "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776428414/PLASTER_DINDING_h19heu.png",
+    "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776428412/PENGECORAN_yzyadu.png",
+    "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776428411/LIFTING_czzpvr.png",
+    "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776428410/SAFETY_ZONE_znk8vv.png",
+    "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776428408/PENGELASAN_cfbtjs.png",
+    "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776428404/SCAFHOLDING_s6d03s.png",
+    "https://res.cloudinary.com/dqsz8sfrw/image/upload/v1776428405/SAFETY_INDUCTION_A3_yfgikq.png",
+  ];
 
-const allPostersViewed = viewedPosters.length === posters.length;
+  const [currentPoster, setCurrentPoster] = useState(0);
+  const [isPosterMaximized, setIsPosterMaximized] = useState(false);
+  const [viewedPosters, setViewedPosters] = useState(() => [0]);
 
-const markPosterViewed = (index) => {
-  setViewedPosters((prev) => (prev.includes(index) ? prev : [...prev, index]));
-};
+  const allPostersViewed = viewedPosters.length === posters.length;
 
-const goToPoster = (index) => {
-  setCurrentPoster(index);
-};
-const nextPoster = () => {
-  setCurrentPoster((prev) => {
-    const next = Math.min(prev + 1, posters.length - 1);
-    markPosterViewed(next);
-    return next;
-  });
-};
+  const markPosterViewed = (index) => {
+    setViewedPosters((prev) => (prev.includes(index) ? prev : [...prev, index]));
+  };
 
-const prevPoster = () => {
-  setCurrentPoster((prev) => {
-    const next = Math.max(prev - 1, 0);
-    markPosterViewed(next);
-    return next;
-  });
-};
-useEffect(() => {
-  if (videoRef.current) {
-    videoRef.current.currentTime = 0;
-    lastTime.current = 0;
-    setWatchTime(0);
-  }
-}, []);
-useEffect(() => {
-  markPosterViewed(currentPoster);
-}, [currentPoster]);
+  const goToPoster = (index) => {
+    setCurrentPoster(index);
+  };
+  const nextPoster = () => {
+    setCurrentPoster((prev) => {
+      const next = Math.min(prev + 1, posters.length - 1);
+      markPosterViewed(next);
+      return next;
+    });
+  };
+
+  const prevPoster = () => {
+    setCurrentPoster((prev) => {
+      const next = Math.max(prev - 1, 0);
+      markPosterViewed(next);
+      return next;
+    });
+  };
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0;
+      lastTime.current = 0;
+      setWatchTime(0);
+    }
+  }, []);
+  useEffect(() => {
+    markPosterViewed(currentPoster);
+  }, [currentPoster]);
 
   // Signature State
   const [agreedToTerms, setAgreedToTerms] = useState(false);
@@ -334,7 +336,7 @@ useEffect(() => {
     setStep(2);
   };
 
-  // --- VIDEO LOGIC ---
+  // --- VIDEO LOGIC (FIXED: Waktu Berjalan Normal Tanpa Lag) ---
   const handleVideoEnded = () => {
     setIsVideoFinished(true);
     setWatchTime(MIN_WATCH_TIME);
@@ -342,28 +344,29 @@ useEffect(() => {
 
   const handleVideoTimeUpdate = (e) => {
     const video = e.target;
-  
-    // 🚫 DETEKSI SKIP
-    if (video.currentTime > lastTime.current + 1) {
+    
+    // 🚫 DETEKSI SKIP (Toleransi 1.5 detik agar tidak salah deteksi saat buffering)
+    if (video.currentTime > lastTime.current + 1.5) {
       video.currentTime = lastTime.current; // balik ke posisi aman
       showNotification("Tidak boleh skip video!", "error");
       return;
     }
-  
-    // ✅ update waktu normal
-    const delta = video.currentTime - lastTime.current;
-  
-    if (delta > 0 && delta < 1) {
-      setWatchTime((prev) =>
-        Math.min(prev + delta, MIN_WATCH_TIME)
-      );
-    }
-  
+    
+    // Simpan posisi terakhir di memori belakang (tidak bikin UI nge-lag)
     lastTime.current = video.currentTime;
+    
+    // ✅ UPDATE STATE UI (Hanya berubah setiap pergantian 1 detik penuh)
+    setWatchTime((prev) => {
+      const currentSeconds = Math.floor(video.currentTime);
+      if (currentSeconds > prev && currentSeconds <= MIN_WATCH_TIME) {
+        return currentSeconds;
+      }
+      return prev;
+    });
   };
+
   const handleVideoSeeking = (e) => {
     const video = e.target;
-  
     if (video.currentTime > lastTime.current + 0.5) {
       video.currentTime = lastTime.current;
       showNotification("Tidak bisa mempercepat video!", "error");
@@ -381,14 +384,14 @@ useEffect(() => {
   const validateQuiz = () => {
     const scoredQuestions = QUIZ_DATA.filter(q => !q.isAnalysis);
     const analysisQuestions = QUIZ_DATA.filter(q => q.isAnalysis);
-  
+    
     // Cek semua soal wajib dijawab (baik penilaian maupun analisis)
     const allAnswered = QUIZ_DATA.every(q => quizAnswers[q.id] !== undefined);
     if (!allAnswered) {
       showNotification("Harap jawab semua pertanyaan (termasuk pertanyaan umpan balik).", "error");
       return;
     }
-  
+    
     // Hitung skor hanya dari soal penilaian
     let correctCount = 0;
     let errors = [];
@@ -399,16 +402,16 @@ useEffect(() => {
         errors.push(q.id);
       }
     });
-  
+    
     const finalScore = Math.round((correctCount / scoredQuestions.length) * 100);
     setQuizScore(finalScore);
     setWrongAnswers(errors);
-  
+    
     setNotification({ msg: `Evaluasi selesai. Skor Anda: ${finalScore}%`, type: "success" });
     setStep(5);
   };
 
-  // --- SIGNATURE LOGIC ---
+  // --- SIGNATURE LOGIC (OPTIMIZED) ---
   const startDrawing = (e) => {
     e.preventDefault();
     if (!agreedToTerms) return showNotification("Mohon centang persetujuan terlebih dahulu.", "error");
@@ -437,7 +440,11 @@ useEffect(() => {
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.stroke();
-    setHasSignature(true);
+    
+    // Optimasi: Hanya trigger set state jika belum ada tanda tangan untuk mencegah re-render puluhan kali/detik
+    if (!hasSignature) {
+      setHasSignature(true);
+    }
   };
 
   const stopDrawing = () => { if (isDrawing) setIsDrawing(false); };
@@ -477,7 +484,7 @@ useEffect(() => {
     try {
       const canvas = canvasRef.current;
       const signatureDataUrl = canvas.toDataURL("image/png");
-  
+      
       // Ambil jawaban soal analisis berdasarkan teks opsi
       const getAnalysisAnswer = (questionId) => {
         const question = QUIZ_DATA.find(q => q.id === questionId);
@@ -487,10 +494,10 @@ useEffect(() => {
         }
         return "";
       };
-  
+      
       const analisisVideo = getAnalysisAnswer(6);   // Soal id 6
       const analisisWeb = getAnalysisAnswer(7);     // Soal id 7
-  
+      
       // Simpan ke Firestore (tambah field analisis)
       const inductionsRef = collection(db, 'artifacts', appId, 'public', 'data', 'inductions');
       const docRef = await addDoc(inductionsRef, {
@@ -503,7 +510,7 @@ useEffect(() => {
         analisisVideo,   // Field baru
         analisisWeb      // Field baru
       });
-  
+      
       // Kirim ke Apps Script (tambah field analisis di kolom K & L)
       await fetch(GAS_URL, {
         method: "POST",
@@ -524,7 +531,7 @@ useEffect(() => {
           analisisWeb      // Kolom L
         }),
       });
-  
+      
       setStep(6);
     } catch (err) {
       console.error(err);
@@ -678,9 +685,9 @@ useEffect(() => {
     ];
     return (
       <div className="relative mb-8 mt-2 px-2 md:px-4 max-w-4xl mx-auto w-full">
-        <div className="absolute top-4 left-6 right-6 md:left-10 md:right-10 h-1 bg-gray-200 rounded-full z-0"></div>
+        <div className="absolute top-4 left-6 right-6 md:left-10 md:right-10 h-1 bg-gray-200 rounded-full z-0 transform-gpu"></div>
         <div 
-          className="absolute top-4 left-6 md:left-10 h-1 bg-yellow-400 rounded-full z-0 transition-all duration-700 ease-in-out"
+          className="absolute top-4 left-6 md:left-10 h-1 bg-yellow-400 rounded-full z-0 transition-all duration-700 ease-in-out transform-gpu will-change-transform"
           style={{ width: `calc(${((Math.min(step, 5) - 1) / 4) * 100}% - 0px)` }}
         ></div>
         <div className="relative z-10 flex justify-between">
@@ -689,7 +696,7 @@ useEffect(() => {
             const isCurrent = step === s.num && step !== 6; 
             const Icon = s.icon;
             return (
-              <div key={s.num} className="flex flex-col items-center">
+              <div key={s.num} className="flex flex-col items-center transform-gpu">
                 <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center border-[3px] md:border-4 transition-all duration-500 transform ${
                   isActive ? 'bg-yellow-400 border-yellow-100 text-slate-900 scale-110 shadow-lg shadow-yellow-400/20' : 'bg-white border-gray-200 text-gray-400 scale-100'
                 }`}>
@@ -709,20 +716,20 @@ useEffect(() => {
   if (isAppLoading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center font-sans text-slate-800 relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none opacity-40">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-yellow-400 rounded-full blur-[120px] opacity-20"></div>
+        <div className="absolute inset-0 pointer-events-none opacity-40 transform-gpu">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-yellow-400 rounded-full blur-[120px] opacity-20 transform-gpu will-change-transform"></div>
         </div>
         <div className="flex flex-col items-center z-10 animate-fade-in-up">
-          <div className="relative">
-            <div className="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-60 animate-pulse"></div>
-            <div className="bg-slate-900 p-5 rounded-3xl shadow-2xl relative animate-pulse border border-slate-700">
+          <div className="relative transform-gpu">
+            <div className="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-60 animate-pulse transform-gpu will-change-transform"></div>
+            <div className="bg-slate-900 p-5 rounded-3xl shadow-2xl relative animate-pulse border border-slate-700 transform-gpu">
               <HardHat className="w-12 h-12 text-yellow-400" />
             </div>
           </div>
           <h2 className="mt-8 text-xl font-extrabold text-slate-900 tracking-widest flex items-center gap-2">MEMUAT SISTEM</h2>
           <p className="text-slate-500 text-xs font-medium mt-2">Digital Safety Induction</p>
-          <div className="w-48 h-1.5 bg-gray-200 rounded-full mt-6 overflow-hidden relative">
-            <div className="absolute top-0 bottom-0 bg-yellow-400 rounded-full" style={{ width: '40%', animation: 'loadingBar 1.5s infinite ease-in-out' }}></div>
+          <div className="w-48 h-1.5 bg-gray-200 rounded-full mt-6 overflow-hidden relative transform-gpu">
+            <div className="absolute top-0 bottom-0 bg-yellow-400 rounded-full transform-gpu will-change-transform" style={{ width: '40%', animation: 'loadingBar 1.5s infinite ease-in-out' }}></div>
           </div>
         </div>
         <style>{`
@@ -751,25 +758,25 @@ useEffect(() => {
         
         {/* Production-Level Notification (Success/Error) - FIXED Z-INDEX MAX */}
         {notification.msg && (
-          <div className="fixed top-4 left-0 right-0 z-[999999] animate-slide-down flex justify-center pointer-events-none px-4">
+          <div className="fixed top-4 left-0 right-0 z-[999999] animate-slide-down flex justify-center pointer-events-none px-4 transform-gpu">
             <div className={`backdrop-blur-md text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 border w-auto max-w-xl mx-auto ring-4 transition-all ${
               notification.type === 'success' 
                 ? 'bg-green-500/95 border-green-400 ring-green-500/20' 
                 : 'bg-red-500/95 border-red-400 ring-red-500/20'
             }`}>
-              {notification.type === 'success' ? <CheckCircle className="w-6 h-6 shrink-0" /> : <AlertTriangle className="w-6 h-6 shrink-0 animate-pulse" />}
+              {notification.type === 'success' ? <CheckCircle className="w-6 h-6 shrink-0" /> : <AlertTriangle className="w-6 h-6 shrink-0 animate-pulse transform-gpu" />}
               <p className="text-sm font-bold tracking-wide">{notification.msg}</p>
             </div>
           </div>
         )}
 
-        <div className="fixed inset-0 z-0 pointer-events-none">
-          <div className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.25]"
+        <div className="fixed inset-0 z-0 pointer-events-none transform-gpu">
+          <div className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.25] transform-gpu will-change-transform"
                style={{ backgroundImage: "url('https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=2069&auto=format&fit=crop')" }} />
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-50/95 via-white/90 to-slate-100/95 backdrop-blur-[2px]"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-50/95 via-white/90 to-slate-100/95 backdrop-blur-[2px] transform-gpu will-change-transform"></div>
         </div>
 
-        <header className="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md border-b border-gray-200 z-50 shadow-sm">
+        <header className="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md border-b border-gray-200 z-50 shadow-sm transform-gpu">
           <div className={`mx-auto p-4 flex items-center justify-between gap-3 transition-all ${viewMode === 'admin' && isAdminLoggedIn ? 'max-w-7xl' : (viewMode === 'user' ? 'max-w-5xl' : 'max-w-md')}`}>
             <div className="flex items-center gap-3">
               <div className={`p-2 rounded-xl shadow-sm ${viewMode === 'admin' ? 'bg-slate-900 text-white' : 'bg-yellow-400 text-slate-900'}`}>
@@ -817,7 +824,7 @@ useEffect(() => {
 
             {/* VIEW: ADMIN LOGIN */}
             {viewMode === 'admin' && !isAdminLoggedIn && (
-              <div className="bg-white rounded-3xl shadow-xl p-8 animate-fade-in-up border border-gray-100 max-w-md mx-auto mt-4">
+              <div className="bg-white rounded-3xl shadow-xl p-8 animate-fade-in-up border border-gray-100 max-w-md mx-auto mt-4 transform-gpu">
                 <div className="text-center mb-8">
                   <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Lock className="w-8 h-8 text-slate-700" />
@@ -841,7 +848,7 @@ useEffect(() => {
                       <input type="password" value={loginForm.password} onChange={(e) => setLoginForm({...loginForm, password: e.target.value})} className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-yellow-400 focus:bg-white transition-all text-slate-800 font-medium" placeholder="Masukkan password" required />
                     </div>
                   </div>
-                  <button type="submit" className="w-full mt-4 bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg">
+                  <button type="submit" className="w-full mt-4 bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg transform transition-transform active:scale-95">
                     Masuk Dashboard <ArrowRight className="w-5 h-5" />
                   </button>
                 </form>
@@ -850,7 +857,7 @@ useEffect(() => {
 
             {/* VIEW: ADMIN DASHBOARD */}
             {viewMode === 'admin' && isAdminLoggedIn && (
-               <div className="animate-fade-in-up">
+               <div className="animate-fade-in-up transform-gpu">
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
                   <div className="relative w-full md:w-1/3">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -887,7 +894,7 @@ useEffect(() => {
                         {isAdminLoading ? (
                           <tr>
                             <td colSpan="6" className="p-16 text-center">
-                              <RefreshCcw className="w-10 h-10 text-yellow-500 mx-auto mb-4 animate-spin opacity-80" />
+                              <RefreshCcw className="w-10 h-10 text-yellow-500 mx-auto mb-4 animate-spin opacity-80 transform-gpu" />
                               <p className="font-medium text-slate-600">Sinkronisasi data sistem...</p>
                             </td>
                           </tr>
@@ -955,15 +962,9 @@ useEffect(() => {
 
                 {/* STEP 1: Form Pendaftaran */}
                 {step === 1 && (
-                  <div className="bg-white rounded-3xl shadow-xl animate-fade-in-up border border-gray-100 overflow-hidden flex flex-col md:flex-row max-w-5xl mx-auto">
-                    {/* <div className="md:w-5/12 bg-slate-900 text-white p-8 md:p-12 flex flex-col justify-center relative overflow-hidden">
-                      <div className="absolute top-0 right-0 w-72 h-72 bg-yellow-400 rounded-full blur-[80px] opacity-20 translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
-                      <ShieldCheck className="w-20 h-20 text-yellow-400 mb-6" />
-                      <h2 className="text-3xl md:text-4xl font-extrabold mb-4 leading-tight">Registrasi<br/>Induksi K3</h2>
-                      <p className="text-slate-400 text-sm md:text-base leading-relaxed">Lengkapi profil identitas dan pekerjaan Anda untuk memulai proses edukasi dan sertifikasi keselamatan digital.</p>
-                    </div> */}
+                  <div className="bg-white rounded-3xl shadow-xl animate-fade-in-up border border-gray-100 overflow-hidden flex flex-col md:flex-row max-w-5xl mx-auto transform-gpu">
                     <div className="w-fit md:w-5/12 bg-slate-900 text-white p-6 md:p-12 flex flex-col justify-center relative overflow-hidden">
-                      <div className="absolute top-0 right-0 w-72 h-72 bg-yellow-400 rounded-full blur-[80px] opacity-20 translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+                      <div className="absolute top-0 right-0 w-72 h-72 bg-yellow-400 rounded-full blur-[80px] opacity-20 translate-x-1/2 -translate-y-1/2 pointer-events-none transform-gpu will-change-transform"></div>
                       <ShieldCheck className="w-15 h-15 text-yellow-400 mb-6" />
                       <h2 className="text-3xl md:text-4xl font-extrabold mb-4 leading-tight">Registrasi<br/>Induksi K3</h2>
                       <p className="text-slate-400 text-sm md:text-base leading-relaxed">Lengkapi profil identitas dan pekerjaan Anda untuk memulai proses edukasi dan sertifikasi keselamatan digital.</p>
@@ -1042,7 +1043,7 @@ useEffect(() => {
 
                 {/* STEP 2: Video Induksi */}
                 {step === 2 && (
-                  <div className="bg-white rounded-3xl shadow-xl p-8 animate-fade-in-up border border-gray-100 max-w-3xl mx-auto">
+                  <div className="bg-white rounded-3xl shadow-xl p-8 animate-fade-in-up border border-gray-100 max-w-3xl mx-auto transform-gpu">
                     <div className="text-center mb-8">
                       <div className="bg-blue-50 w-16 h-16 rounded-2xl text-blue-600 mx-auto flex items-center justify-center mb-4 shadow-sm border border-blue-100"><PlayCircle className="w-8 h-8" /></div>
                       <h2 className="text-2xl font-extrabold text-slate-900">Materi Edukasi K3</h2>
@@ -1054,7 +1055,7 @@ useEffect(() => {
                         Browser tidak mendukung pemutar video.
                       </video>
                       {!isVideoFinished && (
-                        <div className="absolute top-4 right-4 bg-slate-900/80 backdrop-blur-sm px-4 py-2 rounded-full flex items-center gap-2 pointer-events-none border border-white/20">
+                        <div className="absolute top-4 right-4 bg-slate-900/80 backdrop-blur-sm px-4 py-2 rounded-full flex items-center gap-2 pointer-events-none border border-white/20 transform-gpu">
                           <span className="relative flex h-2.5 w-2.5">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
@@ -1102,9 +1103,9 @@ useEffect(() => {
                 {/* STEP 3: Poster */}
                 {step === 3 && (
   <>
-    <div className="bg-white rounded-3xl shadow-xl animate-fade-in-up border border-gray-100 overflow-hidden flex flex-col md:flex-row max-w-6xl mx-auto min-h-[600px]">
+    <div className="bg-white rounded-3xl shadow-xl animate-fade-in-up border border-gray-100 overflow-hidden flex flex-col md:flex-row max-w-6xl mx-auto min-h-[600px] transform-gpu">
       <div className="md:w-5/12 bg-slate-900 border-r border-gray-100 relative overflow-hidden flex flex-col justify-center p-8 md:p-12">
-        <div className="absolute top-0 left-0 w-64 h-64 bg-blue-500 rounded-full blur-[80px] opacity-20 -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+        <div className="absolute top-0 left-0 w-64 h-64 bg-blue-500 rounded-full blur-[80px] opacity-20 -translate-x-1/2 -translate-y-1/2 pointer-events-none transform-gpu will-change-transform"></div>
         <h3 className="text-white font-extrabold text-3xl flex items-center gap-3 mb-4">
           <Info className="w-8 h-8 text-yellow-400" />
           Poster
@@ -1144,10 +1145,10 @@ useEffect(() => {
           <button
             onClick={prevPoster}
             disabled={currentPoster === 0}
-            className={`absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-lg transition-all border ${
+            className={`absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-lg transition-all border transform ${
               currentPoster === 0
                 ? "bg-white/70 text-gray-300 border-gray-200 cursor-not-allowed"
-                : "bg-slate-900/90 text-white border-white/10 hover:bg-slate-800 hover:scale-105"
+                : "bg-slate-900/90 text-white border-white/10 hover:bg-slate-800 hover:scale-105 active:scale-95"
             }`}
             aria-label="Poster sebelumnya"
           >
@@ -1157,10 +1158,10 @@ useEffect(() => {
           <button
             onClick={nextPoster}
             disabled={currentPoster === posters.length - 1}
-            className={`absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-lg transition-all border ${
+            className={`absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-lg transition-all border transform ${
               currentPoster === posters.length - 1
                 ? "bg-white/70 text-gray-300 border-gray-200 cursor-not-allowed"
-                : "bg-slate-900/90 text-white border-white/10 hover:bg-slate-800 hover:scale-105"
+                : "bg-slate-900/90 text-white border-white/10 hover:bg-slate-800 hover:scale-105 active:scale-95"
             }`}
             aria-label="Poster berikutnya"
           >
@@ -1212,7 +1213,7 @@ useEffect(() => {
             disabled={!allPostersViewed}
             className={`w-2/3 font-bold py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg transition-all transform ${
               allPostersViewed
-                ? "bg-slate-900 hover:bg-slate-800 text-white hover:-translate-y-1 hover:shadow-slate-900/20"
+                ? "bg-slate-900 hover:bg-slate-800 text-white hover:-translate-y-1 hover:shadow-slate-900/20 active:scale-95"
                 : "bg-gray-100 text-gray-400 cursor-not-allowed border-2 border-dashed border-gray-200"
             }`}
           >
@@ -1224,7 +1225,7 @@ useEffect(() => {
     </div>
 
     {isPosterMaximized && (
-      <div className="fixed top-20 md:top-24 left-0 right-0 bottom-0 z-40 bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-4">
+      <div className="fixed top-20 md:top-24 left-0 right-0 bottom-0 z-40 bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 transform-gpu">
         <div className="w-full max-w-7xl h-[calc(100vh-5rem)] md:h-[calc(100vh-6rem)] bg-slate-950 rounded-3xl border border-white/10 shadow-2xl overflow-hidden flex flex-col">
           <div className="flex items-center justify-between p-4 md:p-6 border-b border-white/10">
             <div className="text-white font-bold">
@@ -1265,7 +1266,7 @@ useEffect(() => {
               className={`absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-11 h-11 sm:w-14 sm:h-14 rounded-full flex items-center justify-center shadow-lg transition-all border ${
                 currentPoster === 0
                   ? "bg-white/10 text-white/30 border-white/10 cursor-not-allowed"
-                  : "bg-white/10 text-white border-white/15 hover:bg-white/20"
+                  : "bg-white/10 text-white border-white/15 hover:bg-white/20 active:scale-95"
               }`}
               aria-label="Poster sebelumnya"
             >
@@ -1278,7 +1279,7 @@ useEffect(() => {
               className={`absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 w-11 h-11 sm:w-14 sm:h-14 rounded-full flex items-center justify-center shadow-lg transition-all border ${
                 currentPoster === posters.length - 1
                   ? "bg-white/10 text-white/30 border-white/10 cursor-not-allowed"
-                  : "bg-white/10 text-white border-white/15 hover:bg-white/20"
+                  : "bg-white/10 text-white border-white/15 hover:bg-white/20 active:scale-95"
               }`}
               aria-label="Poster berikutnya"
             >
@@ -1310,7 +1311,7 @@ useEffect(() => {
 
                 {/* STEP 4: Kuis */}
                 {step === 4 && (
-                  <div className="bg-white rounded-3xl shadow-xl p-6 md:p-10 animate-fade-in-up border border-gray-100 max-w-3xl mx-auto flex flex-col">
+                  <div className="bg-white rounded-3xl shadow-xl p-6 md:p-10 animate-fade-in-up border border-gray-100 max-w-3xl mx-auto flex flex-col transform-gpu">
                     <div className="mb-8 flex flex-col items-center text-center">
                       <div className="bg-indigo-50 w-16 h-16 flex items-center justify-center rounded-2xl text-indigo-600 mb-4 border border-indigo-100"><ClipboardList className="w-8 h-8" /></div>
                       <h2 className="text-2xl font-extrabold text-slate-900">Kuis Evaluasi K3</h2>
@@ -1344,14 +1345,14 @@ useEffect(() => {
                     </div>
                     <div className="flex gap-4 border-t border-gray-100 pt-8 mt-auto">
                       <button onClick={() => setStep(3)} className="w-1/3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-4 rounded-2xl transition-colors">Kembali</button>
-                      <button onClick={validateQuiz} className="w-2/3 bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-slate-900/20 group">Selesaikan Kuis <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" /></button>
+                      <button onClick={validateQuiz} className="w-2/3 bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-slate-900/20 group active:scale-95">Selesaikan Kuis <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" /></button>
                     </div>
                   </div>
                 )}
 
                 {/* STEP 5: Tanda Tangan */}
                 {step === 5 && (
-                  <div className="bg-white rounded-3xl shadow-xl animate-fade-in-up border border-gray-100 overflow-hidden flex flex-col md:flex-row max-w-5xl mx-auto">
+                  <div className="bg-white rounded-3xl shadow-xl animate-fade-in-up border border-gray-100 overflow-hidden flex flex-col md:flex-row max-w-5xl mx-auto transform-gpu">
                     <div className="md:w-1/2 p-8 md:p-12 bg-slate-50 border-r border-gray-100 flex flex-col h-full">
                       <div className="mb-6 flex items-start gap-4">
                         <div className="bg-yellow-100 w-14 h-14 flex items-center justify-center rounded-2xl text-yellow-600 shrink-0"><PenTool className="w-7 h-7" /></div>
@@ -1396,8 +1397,8 @@ useEffect(() => {
                       </div>
                       <div className="flex gap-4">
                         <button onClick={() => setStep(4)} className="w-1/3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-4 rounded-2xl transition-colors">Kembali</button>
-                        <button onClick={handleSubmit} disabled={isSubmitting || !hasSignature} className="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-slate-900/20 disabled:opacity-50 disabled:cursor-not-allowed">
-                          {isSubmitting ? <span className="flex items-center gap-2"><RefreshCcw className="w-5 h-5 animate-spin" /> Menyimpan...</span> : <>Kirim Data <CheckCircle className="w-5 h-5 text-yellow-400" /></>}
+                        <button onClick={handleSubmit} disabled={isSubmitting || !hasSignature} className="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-slate-900/20 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95">
+                          {isSubmitting ? <span className="flex items-center gap-2"><RefreshCcw className="w-5 h-5 animate-spin transform-gpu" /> Menyimpan...</span> : <>Kirim Data <CheckCircle className="w-5 h-5 text-yellow-400" /></>}
                         </button>
                       </div>
                     </div>
@@ -1406,11 +1407,11 @@ useEffect(() => {
 
                 {/* STEP 6: Success */}
                 {step === 6 && (
-                  <div className="bg-white rounded-3xl shadow-xl p-8 text-center animate-fade-in-up border border-gray-100 relative overflow-hidden max-w-lg mx-auto">
+                  <div className="bg-white rounded-3xl shadow-xl p-8 text-center animate-fade-in-up border border-gray-100 relative overflow-hidden max-w-lg mx-auto transform-gpu">
                     <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-green-50 to-transparent"></div>
                     <div className="relative z-10">
                       <div className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-green-500/30 ring-8 ring-green-50">
-                        <CheckCircle className="w-12 h-12 text-white animate-[scaleIn_0.5s_ease-out]" />
+                        <CheckCircle className="w-12 h-12 text-white animate-[scaleIn_0.5s_ease-out] transform-gpu" />
                       </div>
                       <h2 className="text-3xl font-extrabold mb-2 text-slate-900 tracking-tight">Akses Diberikan!</h2>
                       <p className="text-slate-500 mb-8 leading-relaxed">Terima kasih, <strong className="text-slate-800">{formData.nama}</strong>.<br/>Data keselamatan Anda dengan skor <span className="font-bold text-slate-900">{quizScore}%</span> telah terekam.</p>
@@ -1418,11 +1419,11 @@ useEffect(() => {
                         <div className="bg-white p-3 rounded-xl shadow-sm border border-gray-100"><ShieldCheck className="w-8 h-8 text-green-500" /></div>
                         <div>
                           <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Status Keamanan</p>
-                          <p className="text-lg font-bold text-slate-900 flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>Clear for Entry</p>
+                          <p className="text-lg font-bold text-slate-900 flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse transform-gpu"></span>Clear for Entry</p>
                         </div>
                       </div>
-                      <button onClick={handleFinish} disabled={isFinishing} className="bg-slate-900 text-white font-bold py-4 px-8 rounded-2xl w-full hover:bg-slate-800 transition-colors shadow-xl flex items-center justify-center gap-3 disabled:opacity-80">
-                        {isFinishing ? ( <><RefreshCcw className="w-5 h-5 animate-spin"/> Memproses...</> ) : ( <>Selesai & Kembali <RefreshCcw className="w-4 h-4"/></> )}
+                      <button onClick={handleFinish} disabled={isFinishing} className="bg-slate-900 text-white font-bold py-4 px-8 rounded-2xl w-full hover:bg-slate-800 transition-colors shadow-xl flex items-center justify-center gap-3 disabled:opacity-80 active:scale-95">
+                        {isFinishing ? ( <><RefreshCcw className="w-5 h-5 animate-spin transform-gpu"/> Memproses...</> ) : ( <>Selesai & Kembali <RefreshCcw className="w-4 h-4"/></> )}
                       </button>
                     </div>
                   </div>
@@ -1449,7 +1450,7 @@ useEffect(() => {
 
         {/* MODAL: PREVIEW SIGNATURE */}
         {viewMode === 'admin' && selectedSignature && (
-          <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4 sm:p-6" style={{ backgroundColor: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(8px)' }}>
+          <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4 sm:p-6 transform-gpu" style={{ backgroundColor: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(8px)' }}>
             <div className="absolute inset-0 cursor-pointer" onClick={() => setSelectedSignature(null)}></div>
             <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl animate-fade-in-up overflow-hidden flex flex-col border border-slate-200">
               <div className="flex justify-between items-center p-5 sm:p-6 border-b border-gray-100 bg-slate-50/80">
@@ -1472,7 +1473,7 @@ useEffect(() => {
 
         {/* MODAL: EDIT DATA */}
         {viewMode === 'admin' && isEditModalOpen && editData && (
-          <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4 sm:p-6" style={{ backgroundColor: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(8px)' }}>
+          <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4 sm:p-6 transform-gpu" style={{ backgroundColor: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(8px)' }}>
             <div className="absolute inset-0 cursor-pointer" onClick={() => !isCRUDLoading && setIsEditModalOpen(false)}></div>
             <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl animate-fade-in-up overflow-hidden flex flex-col border border-slate-200 max-h-[90vh]">
               <div className="flex justify-between items-center p-5 border-b border-gray-100 bg-slate-50/80">
@@ -1523,7 +1524,7 @@ useEffect(() => {
               <div className="p-5 border-t border-gray-100 bg-slate-50 flex gap-3 justify-end">
                 <button type="button" disabled={isCRUDLoading} onClick={() => setIsEditModalOpen(false)} className="px-6 py-2.5 font-bold text-slate-600 bg-white border border-gray-200 hover:bg-gray-50 rounded-xl transition-colors">Batal</button>
                 <button type="submit" form="editForm" disabled={isCRUDLoading} className="px-6 py-2.5 font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors shadow-lg flex items-center gap-2 disabled:opacity-70">
-                  {isCRUDLoading ? <RefreshCcw className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                  {isCRUDLoading ? <RefreshCcw className="w-4 h-4 animate-spin transform-gpu" /> : <CheckCircle className="w-4 h-4" />}
                   {isCRUDLoading ? "Menyimpan..." : "Simpan Perubahan"}
                 </button>
               </div>
@@ -1533,7 +1534,7 @@ useEffect(() => {
 
         {/* MODAL: KONFIRMASI HAPUS */}
         {viewMode === 'admin' && deleteData && (
-          <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4 sm:p-6" style={{ backgroundColor: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(8px)' }}>
+          <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4 sm:p-6 transform-gpu" style={{ backgroundColor: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(8px)' }}>
             <div className="absolute inset-0 cursor-pointer" onClick={() => !isCRUDLoading && setDeleteData(null)}></div>
             <div className="relative bg-white rounded-3xl shadow-2xl w-full max-sm animate-fade-in-up overflow-hidden flex flex-col border border-slate-200 text-center p-8">
               <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-5">
@@ -1544,7 +1545,7 @@ useEffect(() => {
               <div className="flex gap-3 w-full">
                 <button disabled={isCRUDLoading} onClick={() => setDeleteData(null)} className="flex-1 bg-gray-100 hover:bg-gray-200 text-slate-700 font-bold py-3.5 rounded-2xl transition-colors disabled:opacity-50">Batal</button>
                 <button disabled={isCRUDLoading} onClick={executeDelete} className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3.5 rounded-2xl transition-colors shadow-lg flex items-center justify-center gap-2 disabled:opacity-70">
-                  {isCRUDLoading ? <RefreshCcw className="w-4 h-4 animate-spin" /> : null}
+                  {isCRUDLoading ? <RefreshCcw className="w-4 h-4 animate-spin transform-gpu" /> : null}
                   {isCRUDLoading ? "Menghapus..." : "Ya, Hapus"}
                 </button>
               </div>
