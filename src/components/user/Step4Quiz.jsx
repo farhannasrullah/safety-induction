@@ -51,7 +51,8 @@ export default function Step4Quiz({
           const isWrong    = wrongAnswers.includes(item.id);
           const groupName  = `question_${item.id}`;
           return (
-            <fieldset
+            /* PERBAIKAN: fieldset diganti menjadi div */
+            <div
               key={item.id}
               className={`p-6 rounded-2xl border transition-all ${
                 isWrong
@@ -59,12 +60,13 @@ export default function Step4Quiz({
                   : 'bg-slate-50 border-slate-200'
               }`}
             >
-              <legend className="font-bold text-slate-800 text-[15px] mb-5 leading-relaxed flex items-start gap-3 w-full">
+              /* PERBAIKAN: legend diganti menjadi div */
+              <div className="font-bold text-slate-800 text-[15px] mb-5 leading-relaxed flex items-start gap-3 w-full">
                 <span className={`flex-shrink-0 w-7 h-7 inline-flex items-center justify-center rounded-full text-xs font-black shadow-sm ${
                   isWrong ? 'bg-red-500 text-white' : 'bg-yellow-400 text-slate-900'
                 }`}>{qIndex + 1}</span>
                 <div className="pt-0.5">{item.question}</div>
-              </legend>
+              </div>
               <div className="space-y-3 md:pl-10">
                 {item.options.map((opt, optIndex) => {
                   const isSelected = quizAnswers[item.id] === optIndex;
@@ -94,7 +96,7 @@ export default function Step4Quiz({
                   );
                 })}
               </div>
-            </fieldset>
+            </div>
           );
         })}
       </div>
