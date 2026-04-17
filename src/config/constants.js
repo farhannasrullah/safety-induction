@@ -15,7 +15,7 @@ export const FIREBASE_CONFIG = {
   // eslint-disable-next-line no-undef
   export const APP_ID = typeof __app_id !== 'undefined' ? __app_id : 'safety-induction-app';
   
-  export const MIN_WATCH_SECONDS = 10;
+  export const MIN_WATCH_SECONDS = 286;
   export const ADMIN_SESSION_DURATION_MS = 3_600_000; // 1 hour
   export const NOTIFICATION_DURATION_MS = 5_000;
   
