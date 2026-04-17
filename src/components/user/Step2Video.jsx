@@ -107,7 +107,7 @@ export default function Step2Video({ setStep, showNotification }) {
         >
           {watchTime >= MIN_WATCH_SECONDS
             ? <><Unlock className="w-5 h-5" /> Lanjut ke Poster</>
-            : <><Lock className="w-5 h-5" /> Tunggu {Math.ceil(MIN_WATCH_SECONDS - watchTime)} detik</>}
+            : <><Lock className="w-5 h-5" /> Lihat Video Sampai Selesai {Math.ceil(MIN_WATCH_SECONDS - watchTime)} detik</>}
         </button>
       </div>
     </div>
